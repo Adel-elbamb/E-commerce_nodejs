@@ -1,13 +1,18 @@
 
 //TRY CATCH
 export const asyncHandler = (fn) => {
-    return (req, res, next) => {
+    return (req, res, next) => { //error is optional 
         fn(req, res, next).catch(error => {
-            return res.json({ message: "Catch error", error: error.message, stack: error.stack })
+            return next(new Error (error , {cause : 500 }))
+            // return res.status(500).json({ message: "Catch error", error: error.message, stack: error.stack }) // stack is the postion of error
         })
     }
 }
 
-export const globalError = (error, req, res, next) => {
-    return res.json({ message: error.message, stack: error.stack })
+export const globalError = (error, req, res, next) => { 
+    if(process.env.MODD == "dev" ) {
+    return res.status(error.cause || 500).json({ message: error.message, stack: error.stack })
+    }
+    return res.json({ message: error.message })
+
 }

@@ -1,7 +1,7 @@
 // import { object } from "joi";
 import mongoose , {Schema , model , Types } from "mongoose";
 
-const catagrySchema =   new Schema ({
+const supcatagrySchema =   new Schema ({
   name : {
     type : String ,
     required : [true , "name is not required "],
@@ -27,10 +27,15 @@ const catagrySchema =   new Schema ({
     isDeleted  : {
         type : Boolean ,
         default : false 
+    } ,
+    catogeryId : {
+        type : Types.ObjectId ,
+        required : true ,
+        ref : "Catogery"
     }
 } , {timestamps : true })
 
 
-const catogreyModel =  mongoose.model.Catogrey|| model ("Catogery" , catagrySchema  )
+const SupCatogeryModel =  mongoose.model.SupCatogrey|| model ("SupCatogrey" , supcatagrySchema  )
 
-export default catogreyModel 
+export default SupCatogeryModel 

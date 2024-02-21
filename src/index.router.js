@@ -1,5 +1,6 @@
 import connection from './DB/connection.js'
 import catogreyRouter from './modules/catogrey/catogrey.router.js'
+import { globalError } from './utils/asyncHandeller.js'
 const bootstrap = (app , express)=> {
     app.use(express.json())
     connection()
@@ -8,6 +9,8 @@ const bootstrap = (app , express)=> {
     app.use( '*' , (req ,res, next) => {
     return res.json({message : 'invalid routing '})
     })
+
+    app.use(globalError)
 }
 
 export  default  bootstrap 
