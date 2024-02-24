@@ -6,7 +6,7 @@ export const validationTypes = {
   export const uploadFile = ({customTypes} ={}) => {
     const storage = multer.diskStorage({})
     const fileFilter = (req, file, cb) => {
-        console.log(file.mimetype);
+        // console.log(file.mimetype);
         if (customTypes.includes(file.mimetype)) {
             cb(null, true)
         } else {

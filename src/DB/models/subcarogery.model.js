@@ -36,6 +36,6 @@ const supcatagrySchema =   new Schema ({
 } , {timestamps : true })
 
 
-const SupCatogeryModel =  mongoose.model.SupCatogrey|| model ("SupCatogrey" , supcatagrySchema  )
+const SubCatogeryModel =  mongoose.model.SubCatogrey|| model ("SubCatogrey" , supcatagrySchema  )
 
-export default SupCatogeryModel 
+export default  SubCatogeryModel

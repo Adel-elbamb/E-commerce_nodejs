@@ -2,20 +2,21 @@ import slugify from 'slugify'
 import catogreyModel from './../../../DB/models/categry.model.js'
  import   cloudinary from './../../../utils/coludinery.js'
 import coludinery from './../../../utils/coludinery.js'
-//  import path from "path"
+import path from 'path'
+
 //addCatogrey
 export const  CreateCatogrey = async (req ,res ,next ) => {
     const {name } = req.body 
     const catogreyExist = await catogreyModel.findOne({name})
     if(catogreyExist) {
-    return res.status(409).json({message : " name catogery is exist  "})
+        return next(new Error (" name catogery is exist  ") , {cause : 409})
     }
     // console.log(req.file)
-    const {public_id , source_url} =  await cloudinary.uploader.upload(req.file.path ,{folder : `/catogrey`})
+    const {public_id , source_url} =  await cloudinary.uploader.upload(req.file.path ,{folder : '/categrey'})
      console.log({public_id , source_url})
     
     if (!public_id) {
-        return res.json({message : "image not upload "})
+        return next(new Error (" name catogery is exist  ") , {cause : 404})
     }
       req.body.slug = await slugify(name) // useing in search and put - between in space
     const newCatogrey = await catogreyModel.create({
@@ -49,7 +50,8 @@ export const updateCatogry = async (req ,res,next) => {
    const {categeryId} = req.params 
 const catogrey = await catogreyModel.findById({_id : categeryId})
  if (!catogrey) {
-    return res.status(404).json({message : "catogry not exist "})
+    return next(new Error ("catogry not exist ") , {cause : 404})
+
  }
 //2-
  if (req.body.name) {
@@ -66,7 +68,8 @@ const catogrey = await catogreyModel.findById({_id : categeryId})
     const {public_id , source_url} =  await cloudinary.uploader.upload(req.file.path ,{folder : `/catogrey`})
     // console.log({public_id , source_url})
    if (!public_id) {
-       return res.json({message : "image not upload "})
+    return next(new Error ("image not upload "))
+
    }
    console.log(catogrey.image.public_id)
 //    const deleteimage = await coludinery.uploader.destroy({public_id : catogrey.image.public_id})
@@ -74,6 +77,6 @@ const catogrey = await catogreyModel.findById({_id : categeryId})
 
 //  4- 
 const updateCatogry = await catogreyModel.findOneAndUpdate({_id : categeryId} , req.body ,{new : true })
-return res.json({message : "done" , updateCatogry })
+return res.status(200).json({message : "done" , updateCatogry })
 }
 
