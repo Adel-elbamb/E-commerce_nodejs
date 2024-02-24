@@ -6,14 +6,16 @@ const supcatagrySchema =   new Schema ({
     type : String ,
     required : [true , "name is not required "],
     unique : [true , "name is not unique "],
-    trim : true 
+    trim : true ,
+    lowercase : true
     
   },
   slug : {
     type : String ,
     required : [true , "slug is  required "],
     unique : [true , "slug is not unique "],
-    trim : true 
+    trim : true ,
+    lowercase : true 
   } , 
   image : {
     type : Object ,

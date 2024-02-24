@@ -30,7 +30,7 @@ export const  CreateCatogrey = async (req ,res ,next ) => {
 
 //allCatogrey 
 export const allCatogery = async (req,res,next) => {
-    const catogery = await catogreyModel.find()
+    const catogery = await catogreyModel.find().populate('SubCatogrey')
     return res.status(200).json({message : "done" , allCatogery : catogery })
 }
 //one Catogry using _id 
