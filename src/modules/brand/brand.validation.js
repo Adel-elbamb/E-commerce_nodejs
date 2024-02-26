@@ -1,0 +1,20 @@
+import joi from 'joi'
+import generalFields from './../../utils/genaralFields.js'
+
+export const addBrandSchema = joi.object({
+    name : generalFields.name ,
+    logo : generalFields.files,
+    // sulg : generalFields.name
+}).required()
+
+export const UpdateBrandSchema = joi.object({
+    brandId : generalFields.id ,
+    name : joi.string().min(3).max(20),
+    logo : generalFields.files,
+    // sulg : generalFields.name
+}).required()
+
+export const oneBrandSchema = joi.object ({
+    brandId : generalFields.id ,
+    // authorization : generalFields.authorization
+})

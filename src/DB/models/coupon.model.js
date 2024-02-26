@@ -12,13 +12,13 @@ const couponSchema =   new Schema ({
   },
   Amout : {
     type : Number ,
-    required : [true , "slug is  required "],
+    required : [true , "Amout is  required "],
     min : [3 ,"min of coupon 3"]  ,
     max : [20 ,"max of coupon 20"] 
   } , 
   image : {
     type : Object ,
-    required : [true , " image is   required " ]
+    required : [false, " image is   required " ]
   } , 
    addBy : {
     type : Types.ObjectId ,

@@ -16,9 +16,9 @@ const brandSchema =   new Schema ({
       trim : true ,
       lowercase : true 
     } , 
-    logo : {
+    image : {
       type : Object ,
-      required : [true , " image is  not required " ]
+      required : [true, " image is required " ]
     } ,
      addBy :  {
       type : Types.ObjectId ,

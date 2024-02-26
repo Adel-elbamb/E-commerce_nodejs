@@ -9,11 +9,12 @@ const router = Router()
   // mergeParams to get url from catogery/catogeryId/subcatogery
 
 router.post ('/'
- ,uploadFile({customTypes : validationTypes.image }).single('logo')
+ ,uploadFile({customTypes : validationTypes.image }).single('image')
+ ,validation(Bv.addBrandSchema)
  ,asyncHandler(BC.Createbrand))
-//  .get('/' , Subcatogery.allSubCatogery)
-//  .get('/:subId' ,validation(VSC.oneSubcatogrySchema), Subcatogery.oneSubcatogry)
-//  .patch('/:subId',uploadFile({customTypes : validationTypes.image}).single('image')
-//  ,validation(VSC.UpdateSubcatogerySchema)
-//  ,asyncHandler(Subcatogery.updateCatogry))
+ .get('/' , BC.allBrand)
+ .get('/:brandId' ,validation(Bv.oneBrandSchema), BC.oneBrand)
+ .patch('/:brandId',uploadFile({customTypes : validationTypes.image}).single('logo')
+ ,validation(Bv.UpdateBrandSchema)
+ ,asyncHandler(BC.updateBrand))
 export default router 
