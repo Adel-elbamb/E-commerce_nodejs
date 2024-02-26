@@ -16,17 +16,20 @@ const validation = (schema) => {
         }
 
 
-        if (req.file) {
+        if (req.file) {  //this req.file is alone becouse validation this can check an object of data 
             data = { ...data, image: req.file }
         }
 
         if (req.files) {
             data = { ...data, files: req.files }
         }
-        console.log(data);
-        const validationResult = schema.validate(data, { abortEarly: false })
+        // console.log(data);
+        const validationResult = schema.validate(data , { abortEarly: false }) // 
+        //{ abortEarly: false } => in validation useing if have more then error retuen all on the time
         if (validationResult.error) {
-            return res.json({ message: "catch validation error", validationResult })
+            req.validationError = validationResult.error // to send validationResult.error from golabel error to return error details for frontend 
+            
+            return next(new Error ("catch validation error"), {cause : 400})
         }
         next()
     }

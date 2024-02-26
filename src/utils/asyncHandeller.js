@@ -10,7 +10,11 @@ export const asyncHandler = (fn) => {
 }
 
 export const globalError = (error, req, res, next) => { 
+     if(req.validationError) {
+        return res.json({message: error.message , validationError : req.validationError.details})
+     }
     if(process.env.MODD == "dev" ) {
+
     return res.status(error.cause || 500).json({ message: error.message, stack: error.stack })
     }
     return res.json({ message: error.message })

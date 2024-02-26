@@ -1,4 +1,4 @@
-import mongoose  , {Schema , model } from "mongoose";
+import mongoose  , {Schema , model , Types } from "mongoose";
 
 const brandSchema =   new Schema ({
     name : {
@@ -29,20 +29,22 @@ const brandSchema =   new Schema ({
           type : Boolean ,
           default : false 
       } ,
-      catogeryId : {
-          type : Types.ObjectId ,
-          required : true ,
-          ref : "Catogery"
-      } ,
-      SubcatogeryId : {
-        type : Types.ObjectId ,
-        required : true ,
-        ref : "SupCatogery"
-      }
+      // catogeryId : {
+      //     type : Types.ObjectId ,
+      //     required : true ,
+      //     ref : "Catogery"
+      // } ,
+      // SubcatogeryId : {
+      //   type : Types.ObjectId ,
+      //   required : true ,
+      //   ref : "SupCatogery"
+      // }
   } , {timestamps : true })
 
 
   const brandModel = mongoose.model.Brand || model("Brand" , brandSchema)
+
+  export default brandModel
 
 
 
