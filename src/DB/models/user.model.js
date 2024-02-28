@@ -33,12 +33,17 @@ const userSchema = new Schema ({
      }, 
      adress : {
         type : String ,
-        required : [true , "adress  is required"],
+        
      },
      loggedIn : {
         type : Boolean ,
         default : false
      } , 
+     deleted : {
+      type :Boolean,
+      default : false
+     }
+      , 
      role : {
         type : String ,
         enum : ['User' , "Admin"] ,
@@ -48,3 +53,5 @@ const userSchema = new Schema ({
 }, {timestamps : true })
 
 const userModel = mongoose.model.User||model("User" , userSchema)
+
+export default userModel

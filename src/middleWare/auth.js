@@ -15,7 +15,7 @@ const auth = asyncHandler(
         if (!payload?._id) {
             return next(new Error('invalid payload'))
         }
-        const user = await userModel.findById({ _id: payload._id }).select('email')
+        const user = await userModel.findById({ _id: payload._id }).select('email  role ')
         if (!user) {
             return next(new Error('invalid id'))
         }
