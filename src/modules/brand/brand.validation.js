@@ -18,3 +18,7 @@ export const oneBrandSchema = joi.object ({
     brandId : generalFields.id ,
     // authorization : generalFields.authorization
 })
+
+export const tokenSchema = joi.object({
+    authorization : generalFields.authorization
+})

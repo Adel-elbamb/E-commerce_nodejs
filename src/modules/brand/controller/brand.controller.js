@@ -1,14 +1,26 @@
 import slugify from 'slugify'
 import brandModel from './../../../DB/models/brand.model.js'
+import catogeryModel from './../../../DB/models/categry.model.js'
+import subcatogeryModel from './../../../DB/models/subcarogery.model.js'
  import   cloudinary from './../../../utils/coludinery.js'
 
 //addCatogrey
 export const  Createbrand = async (req ,res ,next ) => {
-    const {name } = req.body 
+    const {name , catogeryId , subcatogeryId} = req.body 
+    //find catogery 
+    const catogery = await catogeryModel.findOne({ _id : catogeryId}) 
+    if(!catogery) {
+        return next(new Error ("not found catogery "))
+    }
+    const subcatogery = await  subcatogeryModel.findOne({_id : subcatogeryId})
+    if(!subcatogery) {
+        return next (new Error ("not found sub catogery"))
+    }
     const brandExist = await brandModel.findOne({name})
     if(brandExist) {
         return next(new Error (" name brand  is exist  ") , {cause : 409})
     }
+    //add image 
     // console.log(req.file)
     const {public_id , source_url} =  await cloudinary.uploader.upload(req.file.path ,{folder : `/brand`})
      console.log({public_id , source_url})
@@ -21,6 +33,8 @@ export const  Createbrand = async (req ,res ,next ) => {
         name ,
          image : {public_id , source_url} ,
          slug : name ,
+         catogeryId ,
+         subcatogeryId
     }) 
      return res.status(201).json({message : "done"  , newbrand})
 
@@ -45,11 +59,11 @@ export const oneBrand = async (req,res,next) => {
 // //4- update catory 
 export const updateBrand = async (req ,res,next) => {
     // 1-
-   const {brandId} = req.params 
-const brand = await brandModel.findById({_id : brandId})
- if (!brand) {
-    return next(new Error ("Brand not exist ") , {cause : 404})
- }
+    const {brandId} = req.params 
+    const brand = await brandModel.findById({_id : brandId})
+    if (!brand) {
+        return next(new Error ("Brand not exist ") , {cause : 404})
+    }
 //2-
  if (req.body.name) {
     const nameExist = await brandModel.findOne({ name : req.body.name})
@@ -76,4 +90,6 @@ const brand = await brandModel.findById({_id : brandId})
 const updateBrand = await brandModel.findOneAndUpdate({_id : brandId} , req.body ,{new : true })
 return res.status(200).json({message : "done" , updateBrand })
 }
+
+
 

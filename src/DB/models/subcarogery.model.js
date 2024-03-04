@@ -21,9 +21,13 @@ const supcatagrySchema =   new Schema ({
     type : Object ,
     required : [true , " image is  not required " ]
   } ,
-   userId :  {
+  createdBy :  {
     type : Types.ObjectId ,
-    required : [false , "user id is not required "] ,
+    required : [true , "user id is  required "] ,
+    ref : "User"
+   } ,
+   updatedBy : {
+    type : Types.ObjectId ,
     ref : "User"
    } ,
     isDeleted  : {

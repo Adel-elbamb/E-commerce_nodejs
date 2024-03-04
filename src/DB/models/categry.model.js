@@ -21,9 +21,13 @@ const catagrySchema =   new Schema ({
     type : Object ,
     required : [true , " image is   required " ]
   } ,
-   userId :  {
+   createdBy :  {
     type : Types.ObjectId ,
     required : [false , "user id is  required "] ,
+    ref : "User"
+   } ,
+   updatedBy : {
+    type : Types.ObjectId ,
     ref : "User"
    } ,
     isDeleted  : {

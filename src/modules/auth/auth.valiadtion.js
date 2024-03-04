@@ -20,4 +20,15 @@ export const loginSchema = joi.object({
     password: generalFields.password
 }).required()
 
+export const sendCodeSchema = joi.object({
+    email: generalFields.email,
+}).required()
+
+export const forgetPasswordSchema = joi.object({
+    email: generalFields.email,
+    password : generalFields.password ,
+    // cPassword: joi.string().valid(joi.ref('password')).required() ,
+    code : joi.string().length(5).pattern(new RegExp(/^\d{5}$/))
+
+})
 

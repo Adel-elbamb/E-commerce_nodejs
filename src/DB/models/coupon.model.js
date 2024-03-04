@@ -20,11 +20,15 @@ const couponSchema =   new Schema ({
     type : Object ,
     required : [false, " image is   required " ]
   } , 
-   addBy : {
+  createdBy :  {
     type : Types.ObjectId ,
-    required : [false , "user id is  required "] ,
+    required : [true , "user id is  required "] ,
     ref : "User"
-   },
+   } ,
+   updatedBy : {
+    type : Types.ObjectId ,
+    ref : "User"
+   } ,
    usedBy :  {
     type : Types.ObjectId ,
     ref : "User"

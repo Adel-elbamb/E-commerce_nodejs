@@ -16,5 +16,9 @@ export const UpdateCatogrySchema = joi.object({
 
 export const oneCatogrySchema = joi.object ({
     CatogeryId : generalFields.id ,
-    // authorization : generalFields.authorization
+     authorization : generalFields.authorization
+})
+
+export const tokenSchema = joi.object({
+    authorization : generalFields.authorization
 })

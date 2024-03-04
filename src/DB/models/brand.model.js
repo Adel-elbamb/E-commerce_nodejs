@@ -20,25 +20,29 @@ const brandSchema =   new Schema ({
       type : Object ,
       required : [true, " image is required " ]
     } ,
-     addBy :  {
+    createdBy :  {
       type : Types.ObjectId ,
-      required : [false , "user id is not required "] ,
+      required : [true , "user id is  required "] ,
+      ref : "User"
+     } ,
+     updatedBy : {
+      type : Types.ObjectId ,
       ref : "User"
      } ,
       isDeleted  : {
           type : Boolean ,
           default : false 
       } ,
-      // catogeryId : {
-      //     type : Types.ObjectId ,
-      //     required : true ,
-      //     ref : "Catogery"
-      // } ,
-      // SubcatogeryId : {
-      //   type : Types.ObjectId ,
-      //   required : true ,
-      //   ref : "SupCatogery"
-      // }
+      catogeryId : {
+          type : Types.ObjectId ,
+          required : true ,
+          ref : "Catogery"
+      } ,
+      subcatogeryId : {
+        type : Types.ObjectId ,
+        required : true ,
+        ref : "SupCatogery"
+      }
   } , {timestamps : true })
 
 

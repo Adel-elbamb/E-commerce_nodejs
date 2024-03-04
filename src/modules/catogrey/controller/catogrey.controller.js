@@ -19,11 +19,16 @@ export const  CreateCatogrey = async (req ,res ,next ) => {
         return next(new Error (" name catogery is exist  ") , {cause : 404})
     }
       req.body.slug = await slugify(name) // useing in search and put - between in space
+      let {createdBy} = req.body
+      createdBy = req.user._id// user from middleWare auth
+       console.log(createdBy)
     const newCatogrey = await catogreyModel.create({
         name ,
          image : {public_id , source_url} ,
-         slug : name 
+         slug : name ,
+        createdBy
     }) 
+
      return res.status(201).json({message : "done"  , newCatogrey})
 
 }
@@ -71,10 +76,10 @@ const catogrey = await catogreyModel.findById({_id : categeryId})
     return next(new Error ("image not upload "))
 
    }
-   console.log(catogrey.image.public_id)
+//    console.log(catogrey.image.public_id)
 //    const deleteimage = await coludinery.uploader.destroy({public_id : catogrey.image.public_id})
  }
-
+      req.body.updated = req.user._id
 //  4- 
 const updateCatogry = await catogreyModel.findOneAndUpdate({_id : categeryId} , req.body ,{new : true })
 return res.status(200).json({message : "done" , updateCatogry })

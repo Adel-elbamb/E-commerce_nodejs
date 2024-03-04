@@ -42,8 +42,15 @@ const userSchema = new Schema ({
      deleted : {
       type :Boolean,
       default : false
-     }
-      , 
+     } ,
+     code  : {
+      type :  String 
+     },
+     status : {
+      type : String ,
+      enum : ["online" , "offline "] ,
+      default : "offline "
+     }, 
      role : {
         type : String ,
         enum : ['User' , "Admin"] ,
