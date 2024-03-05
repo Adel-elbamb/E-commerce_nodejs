@@ -29,6 +29,8 @@ export const  Createbrand = async (req ,res ,next ) => {
         return next(new Error (" name catogery is exist  ") , {cause : 404})
     }
       req.body.slug = await slugify(name) // useing in search and put - between in space
+    //   console.log(req.user._id)
+   req.body.createdBy = req.user._id 
     const newbrand = await brandModel.create({
         name ,
          image : {public_id , source_url} ,

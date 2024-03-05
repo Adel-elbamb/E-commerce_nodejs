@@ -3,7 +3,10 @@ import generalFields from './../../utils/genaralFields.js'
 
 export const addBrandSchema = joi.object({
     name : generalFields.name ,
+    image : generalFields.files,
     logo : generalFields.files,
+    catogeryId : generalFields.id ,
+    subcatogeryId : generalFields.id
     // sulg : generalFields.name
 }).required()
 

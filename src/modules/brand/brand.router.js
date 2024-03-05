@@ -4,11 +4,13 @@ import validation from '../../middleware/validation.js'
 import {uploadFile , validationTypes } from './../../utils/cloudinryMulter.js'
 import * as BC from './controller/brand.controller.js'
 import * as Bv from './brand.validation.js'
+import auth from './../../middleWare/auth.js'
 
 const router = Router()
   // mergeParams to get url from catogery/catogeryId/subcatogery
 
-router.post ('/'
+router.post ('/' ,
+auth
  ,uploadFile({customTypes : validationTypes.image }).single('image')
  ,validation(Bv.addBrandSchema)
  ,asyncHandler(BC.Createbrand))
