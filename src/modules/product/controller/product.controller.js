@@ -1,92 +1,183 @@
-import ProductModel from './../../../DB/models/product.model.js'
-import brandModel from './../../../DB/models/brand.model.js'
-import catogeryModel from './../../../DB/models/categry.model.js'
-import SubCatogeryModel from './../../../DB/models/subcarogery.model.js'
-import   cloudinary from './../../../utils/coludinery.js'
-import generateUniqueString from './../../../utils/genrateUniqeString.js'
-import productModel from './../../../DB/models/product.model.js'
-import slugify from 'slugify'
-//================================= Add product API =================================//
- 
-export const addProduct = async(req ,res, next ) => {
-    const {catogeryId , brandId , subcarogeryId } = req.body 
-     const catogery = await catogeryModel.findOne ({_id : catogeryId , isDeleted : false })
-     if (!catogery) {
-        return next(new Error ("not found catogery "))
-     }
+import { asyncHandler } from "../../../utils/asynchandler.js";
+import slugify from "slugify";
+import cloudinary from "../../../utils/cloudinary.js";
+import categoryModel from "../../../../DB/model/Category.model.js";
+import SubCategoryModel from "../../../../DB/model/SubCategory.model.js";
+import brandModel from "../../../../DB/model/Brand.model.js";
+import { nanoid } from "nanoid";
+import productModel from "../../../../DB/model/Product.model.js";
+import ApiFeatures from "../../../utils/apiFeatures.js";
 
-    //  const subcatogery = await SubCatogeryModel.findOne ({_id : subcarogeryId , isDeleted : false })
-    //  if (!subcatogery) {
-    //     return next(new Error ("not found Subcatogery "))
-    //  }
+//================================create Product =================================
+//1-check category exist
+//2-check subcategory exist ==> (categoryId == categoryId.body)
+//3-check if brand exist
+//4-slug
+//5-price --> =totalprice - (total*dis)/100
+//6- upload mainimage
+//7-if sub --> upload
+//createby
 
-     const brand = await brandModel.findOne ({_id : brandId , isDeleted : false })
-     if (!brand ) {
-        return next(new Error ("not found brand  "))
-     }
-     const {name} = req.body 
-    //  req.body.slug =  await slugify (name) 
-
-     // price 
-      let {totalPrice , price , discount } = req.body
-     totalPrice =  price -((price * discount || 0 ) /100)
-     //image 
-     const {public_id , source_url} =  await cloudinary.uploader.upload(req.files.mainImage[0].path ,{folder : `/product `})
-     console.log({public_id , source_url})
-    
-    if (!public_id) {
-        return next(new Error (" name catogery is exist  ") , {cause : 404})
-    } 
-    const product = await productModel.create(req.body)
-
-      return res.json ({message : "done " , product})
-
-}
-
-
-export const allProduct = async (req,res,next) => {
-    const allProduct = await ProductModel.find()
-    return res.status(200).json({message : "done" ,allProduct })
-}
-
-export const oneProduct = async (req,res,next) => {
-    const {productId} = req.params 
-    const product = await catogreyModel.findById({_id : productId})
-    return res.status(200).json({message : "one catogrey is " , product })
-}
-
-
-
-    export const updateCatogry = async (req ,res,next) => {
-        // 1-
-       const {ProductId} = req.params
-    const  subcarogery = await productModel.findById({ _id : ProductId})
-     if (!subcarogery) {
-        return next(new Error ("catogry not exist ") , {cause : 404})
-     }
-    
-    
-    //2-
-     if (req.body.name) {
-        const nameExist = await productModel.findOne({ name : req.body.name})
-         if(nameExist) {
-            // return res.status(409).json({message : "catogry name exist before "})
-            return next (new Error ("Product name exist before " , {cause : 409}))
-    
-         }
-         req.body.slug = slugify(req.body.name)
-     }
-    //3-
-    console.log(req.file)
-     if(req.body.image) {
-        const {public_id , source_url} =  await cloudinary.uploader.upload(req.file.path ,{folder : `/catogrey/${req.params.categeryId}/SubCatogery`})
-       if (!public_id) {
-        return next(new Error ("image not upload "))
-       }
-        const deleteimage = await coludinery.uploader.destroy({public_id : subcarogery.image.public_id})
-     }
-    
-    //  4- 
-    const updateSubCatogry = await productModel.findOneAndUpdate({_id : subId} , req.body ,{new : true })
-    return res.status(200).json({message : "done" ,  updateSubCatogry })
+export const addProduct = asyncHandler(async (req, res, next) => {
+  const { categoryId, subcategoryId, brandId } = req.body;
+  if (!(await categoryModel.findOne({ _id: categoryId, isDeleted: false }))) {
+    return next(new Error("invalid categoryId"), { cause: 404 });
+  }
+  if (
+    !(await SubCategoryModel.findOne({
+      _id: subcategoryId,
+      isDeleted: false,
+      categoryId,
+    }))
+  ) {
+    return next(new Error("invalid subcategoryId"), { cause: 404 });
+  }
+  if (!(await brandModel.findOne({ _id: brandId, isDeleted: false }))) {
+    return next(new Error(" invalid brandId"), { cause: 404 });
+  }
+  req.body.slug = slugify(req.body.name, {
+    trim: true,
+    lower: true,
+  });
+  req.body.totalPrice =
+    req.body.price - (req.body.price * req.body.discount || 0) / 100;
+  req.body.customId = nanoid();
+  const { public_id, secure_url } = await cloudinary.uploader.upload(
+    req.files.mainImage[0].path,
+    {
+      folder: `${process.env.APP_NAME}/category/${categoryId}/subcategory/${subcategoryId}/products/${req.body.customId}/mainImage`,
     }
+  );
+  if (!public_id) {
+    return next(new Error("image not uploaded", { cause: 400 }));
+  }
+   req.body.mainImage = { public_id, secure_url }
+  let images = [];
+  if (req.files?.subImage?.length) {
+    for (const file of req.files.subImage) {
+      const { public_id, secure_url } = await cloudinary.uploader.upload(
+        file.path,
+        {
+          folder: `${process.env.APP_NAME}/category/${categoryId}/subcategory/${subcategoryId}/products/${req.body.customId}/subImage`,
+        }
+      );
+      if (!public_id) {
+        return next(new Error("image not uploaded", { cause: 400 }));
+      }
+      images.push({ public_id, secure_url });
+    }
+    req.body.subImage = images;
+  }
+  req.body.createdBy = req.user._id;
+  const product = await productModel.create(req.body);
+  return res.status(201).json({ message: "done", product });
+});
+ //===================================all product ===================================
+export const allProducts = asyncHandler(async (req, res, next) => {
+  const apiFeatures = new ApiFeatures(productModel.find(), req.query)
+    .pagination()
+    .filter()
+    .sort()
+    .fields()
+    .search();
+  const allProducts = await apiFeatures.mongooseQuery;
+  if (!allProducts) {
+      return next(new Error("no products match this conditions"), { cause: 404 });
+  }
+
+  res.status(200).json({ message: "done", allProducts });
+});
+//==========================one product ======================================
+export const oneProduct = asyncHandler(async (req, res, next) => {
+  const { productId } = req.params;
+  const oneProduct = await productModel.findOne({ _id: productId });
+    if (!oneProduct) {
+      return next(new Error("product not found"), {
+        cause: 404,
+      });
+    }
+  res.status(200).json({ message: "done", oneProduct });
+});
+//===========================================update product =============================
+//check product exist
+//check category exist
+//check subcategory exist ==> (categoryId == categoryId.body)
+//check if brand exist
+//if name --> change slug
+//if price or discount change --> =totalprice - (total*dis)/100
+//upload mainimage
+//if sub --> upload
+//createby
+
+export const updateProduct = asyncHandler(async (req, res, next) => {
+  const { categoryId, subcategoryId, brandId } = req.body;
+  const productExist = await productModel.findById({
+    _id: req.params.productId,
+  });
+  if (!productExist) {
+    return next(new Error("invalid productId"), { cause: 404 });
+  }
+  if (!(await categoryModel.findOne({ _id: categoryId, isDeleted: false }))) {
+    return next(new Error("invalid categoryId"), { cause: 404 });
+  }
+  if (
+    !(await SubCategoryModel.findOne({
+      _id: subcategoryId,
+      isDeleted: false,
+      categoryId,
+    }))
+  ) {
+    return next(new Error("invalid subcategoryId"), { cause: 404 });
+  }
+  if (!(await brandModel.findOne({ _id: brandId, isDeleted: false }))) {
+    return next(new Error(" invalid brandId"), { cause: 404 });
+  }
+  if (req.body.name) {
+     req.body.slug = slugify(req.body.name, {
+       trim: true,
+       lower: true,
+     });
+  }
+
+  if (req.body.price || req.body.discount) {
+   req.body.totalPrice =
+    ( req.body.price ||
+     productExist.price) -
+    (   ((req.body.price || productExist.price) *
+         (req.body.discount || productExist.discount)) /
+         100)
+ }
+  req.body.customId = nanoid()
+  if (req.files?.mainImage) {
+    const { public_id, secure_url } = await cloudinary.uploader.upload(
+      req.files.mainImage[0].path,
+      {
+        folder: `${process.env.APP_NAME}/category/${categoryId}/subcategory/${subcategoryId}/products/${req.body.customId}/mainImage`,
+      }
+    );
+    if (!public_id) {
+      return next(new Error("image not uploaded", { cause: 400 }));
+    }
+    req.body.mainImage = { public_id, secure_url };
+  }
+
+  let images = []
+  if (req.files?.subImage?.length) {
+    for (const file of req.files.subImage) {
+      const { public_id, secure_url } = await cloudinary.uploader.upload(
+        file.path,
+        {
+          folder: `${process.env.APP_NAME}/category/${categoryId}/subcategory/${subcategoryId}/products/${req.body.customId}/subImage`,
+        }
+      );
+      if (!public_id) {
+        return next(new Error("image not uploaded", { cause: 400 }));
+      }
+      images.push({ public_id, secure_url });
+    }
+    req.body.subImage = images;
+  }
+  req.body.createdBy = req.user._id
+  const product = await productModel.findOneAndUpdate({_id: req.params.productId},req.body,{new:true});
+  return res.status(200).json({ message: "done", product });
+});

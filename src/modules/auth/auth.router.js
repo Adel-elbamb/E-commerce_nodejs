@@ -1,35 +1,60 @@
-import Router from 'express'
-import validation from '../../middleware/validation.js'
-import * as authC from './controller/auth.controller.js'
-import * as authV from './auth.valiadtion.js'
-import {asyncHandler} from './../../utils/asyncHandeller.js'
+import { Router } from "express"
+import * as authController from './controller/auth.controller.js'
+import validation from "../../middleware/validation.js"
+import * as authValidation from './auth.validation.js'
+import auth from "../../middleware/auth.js"
+import authEndpoint from "./auth.endpoint.js"
 const router = Router()
-router.post
-('/signup' , 
-validation(authV.signupSchema) ,
-asyncHandler(authC.signUp)
+
+router
+  .post(
+    "/signUp",
+    validation(authValidation.signupSchema),
+    authController.signUp
+  )
+  .get(
+    "/confirmEmail/:token",
+    validation(authValidation.tokenSchema),
+    authController.confirmEmail
+  )
+  .get(
+    "/refreshToken/:token",
+    validation(authValidation.tokenSchema),
+    authController.refreshToken
+  )
+  .post("/login", validation(authValidation.loginSchema), authController.login)
+  .patch(
+    "/sendCode",
+    validation(authValidation.sendCodeSchema),
+    authController.sendCode
+  )
+  .put(
+    "/forgetPassword",
+    validation(authValidation.forgetPasswordSchema),
+    authController.forgetPassword
+  )
+  //updatePassword
+  .put(
+    "/updatePassword/:userId",
+    validation(authValidation.authSchema, true),
+    auth(authEndpoint.updatePassword),
+    validation(authValidation.updatePasswordSchema),
+    authController.updatePassword
 )
-.get(
-    '/confirmEmail/:token'  
-,asyncHandler(authC.confiremEmail)
-)
-.get(
-    '/refreshToken/:token' 
-    , asyncHandler(authC.refreshToken)
-    ) 
-.post('/login' ,
- validation(authV.loginSchema)
- ,asyncHandler(authC.login)
- )
- .patch(
-    '/'
-    ,validation(authV.sendCodeSchema)
-    ,authC.sendCode
-    )
-.put(
-    '/' ,
-    validation(authV.forgetPasswordSchema) ,
-    asyncHandler(authC.forgetPassword)
-)
- 
-export default router 
+
+//updateAccount
+.put('/update/:userId',
+validation(authValidation.authSchema,true),
+auth(authEndpoint.updateAccount),
+validation(authValidation.updateSchema)
+,authController.updateAccount)
+
+//delete account
+.delete('/delete/:userId',
+validation(authValidation.authSchema,true),
+auth(authEndpoint.deleteAccount),
+validation(authValidation.deleteSchema),
+authController.deleteAccount)
+  
+// .post("/loginWithgmail", authController.loginWithgmail);
+export default router

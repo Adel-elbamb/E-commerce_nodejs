@@ -1,74 +1,65 @@
-import couponModel from "../../../DB/models/coupon.model.js";
- import   cloudinary from './../../../utils/coludinery.js'
+import cloudinary from '../../../utils/cloudinary.js'
+import couponModel from "../../../../DB/model/Coupon.model.js";
+import { asyncHandler } from "../../../utils/asynchandler.js";
 
-//addcoupon
-export const  CreateCoupon= async (req ,res ,next ) => {
-    const {name } = req.body 
-    const catogreyExist = await couponModel.findOne({name})
-    if(catogreyExist) {
-        return next(new Error (" name catogery is exist  ") , {cause : 409})
+//============================= create Coupon ===============================
+export const createCoupon = asyncHandler(
+    async(req,res,next)=>{
+const {name} = req.body 
+if (await couponModel.findOne({name})){
+    return next(new Error('name already exist'),{cause:409})
+}
+if(req.file){
+
+    const {public_id,secure_url} = await cloudinary.uploader.upload(req.file.path,{folder : `${process.env.APP_NAME}/coupon`})
+    if(!public_id){
+        return next(new Error('image not uploaded',{cause: 400}))
     }
-    // console.log(req.file)
-    let {image} = req.body
-    const {public_id , source_url} =  await cloudinary.uploader.upload(req.file.path ,{folder : '/coupon'})
-     console.log({public_id , source_url})
+    req.body.image = {public_id,secure_url}
+    }
+    req.body.createdBy = req.user._id
+const coupon = await couponModel.create(req.body)
+res.status(201).json({message:"coupon created successfully",coupon})
+    }
+)
+ //==============================allCoupons ==============================
+export const allCoupons = asyncHandler(async(req,res,next)=>{ 
+    const allCoupons = await couponModel.find({})
+    return res.status(200).json({message:"done",allCoupons}) 
+})
+//=================================one coupon ===================================
+export const oneCoupon = asyncHandler(async(req,res,next)=>{
+    const oneCoupon = await couponModel.findById({ _id: req.params.couponId })
+    if (!oneCoupon) {
+                return next(new Error("coupon not found", { cause: 404 }));
+    }
+    return res.status(200).json({message:"done",oneCoupon}) 
+    })
+
+export const updateCoupon = asyncHandler(async(req,res,next)=>{
+    const {couponId} = req.params
+    const couponExist = await couponModel.findById({_id : couponId})
+    if (! couponExist) {
+        return next(new Error('coupon not found',{cause: 404}))
+        }
+    if(req.body.name){
+        const name_exist = await couponModel.findOne({name: req.body.name})
+        if(name_exist){
+            return next(new Error('name must be unique',{cause: 409}))
+        }}
+    if(req.file){
+    const {public_id,secure_url} = await cloudinary.uploader.upload(req.file.path,{folder : `${process.env.APP_NAME}/coupon`})
+      if(!public_id){
+        return next(new Error('image not uploaded',{cause: 400}))
+    }
+    req.body.image = {public_id,secure_url}
+    if(couponExist.image?.public_id){
+    await cloudinary.uploader.destroy(couponExist.image.public_id)
+    }
+    }
+    req.body.updatedBy = req.user._id
+    const updated = await couponModel.findOneAndUpdate({_id : couponId},req.body,{new : true})
     
-    if (!public_id) {
-        return next(new Error (" name catogery is exist  ") , {cause : 404})
-    }
-      image  = {public_id , source_url} 
-    const  newCoupon= await    couponModel.create(req.body) 
-     return res.status(201).json({message : "done"  , newCoupon})
-
-}
-
-// allCoupon
-export const allCoupon = async (req,res,next) => {
-    const  coupon = await couponModel.find()
-    return res.status(200).json({message : "done" , allcoupon: coupon })
-}
-//one Catogry using _id 
-
-export const oneCoupon = async (req,res,next) => {
-    const {CouponId} = req.params 
-    const coupon = await couponModel.findById({_id : CouponId})
-    return res.status(200).json({message : "one coupon " , coupon })
-}
-// update Catogery 
-//1-if catogery exist 
-//2-if update name --> name is exist --> change slug 
-//3-if update image --> chanage image --> remove image befor 
-//4- update catory 
-export const updateCoupon = async (req ,res,next) => {
-    // 1-
-   const {CouponId} = req.params 
-  const Coupon= await couponModel.findById({_id : CouponId})
- if (!Coupon) {
-    return next(new Error ("Coupon not exist ") , {cause : 404})
-
- }
-//2-
- if (req.body.name) {
-    const nameExist = await couponModel.findOne({ name : req.body.name})
-     if(nameExist) {
-        // return res.status(409).json({message : "catogry name exist before "})
-        return next (new Error ("Coupon name exist before " , {cause : 409}))
-     }
- }
-//3-
- if(req.body.image) {
-    const {public_id , source_url} =  await cloudinary.uploader.upload(req.file.path ,{folder : `/coupon`})
-    // console.log({public_id , source_url})
-   if (!public_id) {
-    return next(new Error ("image not upload "))
-
-   }
-//    console.log(catogrey.image.public_id)
-       await coludinery.uploader.destroy({public_id : Coupon.image.public_id})
- }
-
-// 4
-const updateCoupon = await couponModel.findOneAndUpdate({_id : CouponId} , req.body ,{new : true })
-return res.status(200).json({message : "done" , updateCoupon })
-}
-
+    return res.status(200).json({message:"updated sucessfully",updated}) 
+    
+    })

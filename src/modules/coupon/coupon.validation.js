@@ -1,24 +1,30 @@
 import joi from 'joi'
-import generalFields from './../../utils/genaralFields.js'
+import { generalfields } from '../../utils/generalfields.js'
 
-export const addCouponSchema = joi.object({
-    name : generalFields.name ,
-    image : generalFields.files.required(),
-    Amout : joi.number().min(0).max(10).required() ,
-    expireIn : joi.date().required() ,
-    userId : generalFields.id
+export const oneCouponSchema = joi.object({
+    couponId : generalfields.id
 }).required()
 
-export const UpdateCouponSchema = joi.object({
-    CouponId : generalFields.id ,
-    name : joi.string().min(3).max(20),
-    image : generalFields.files,
-    Amout : joi.number().min(0).max(10),
-    expireIn : joi.date(),
-   
+export const addCouponSchema = joi
+  .object({
+    name: joi.string().max(15).min(2).trim().required(),
+    file: generalfields.file,
+    amount: joi.number().positive().min(1).max(100).required(),
+    expireIn: joi.date().greater(new Date()).required()
+  })
+  .required();
+
+export const updateCouponSchema = joi.object({
+    name : joi.string().max(15).min(2).trim(),
+    amount : joi.number().positive().min(1).max(100),
+    file : generalfields.file,
+    expireIn: joi.date().greater(new Date()),
+    couponId : generalfields.id
 }).required()
 
-export const oneCouponSchema = joi.object ({
-    CouponId : generalFields.id ,
-    // authorization : generalFields.authorization
-}).required()
+export const authSchema = joi
+  .object({
+    auth: joi.string().required(),
+  })
+  .required();
+

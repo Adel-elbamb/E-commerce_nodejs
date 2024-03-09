@@ -1,5 +1,5 @@
 {
-  "name": "e-commerce_nodejs",
+  "name": "ecommerce",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,17 +12,18 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "cloudinary": "^2.0.1",
-    "dotenv": "^16.4.4",
+    "cloudinary": "^1.41.2",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "express-async-handler": "^1.2.0",
-    "joi": "^17.12.1",
+    "google-auth-library": "^9.6.3",
+    "joi": "^17.11.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.1.2",
+    "mongoose": "^8.0.4",
     "multer": "^1.4.5-lts.1",
-    "nanoid": "^5.0.6",
-    "nodemailer": "^6.9.9",
-    "qrcode": "^1.5.3",
-    "slugify": "^1.6.6"
+    "nanoid": "^5.0.4",
+    "nodemailer": "^6.9.8",
+    "pdfkit": "^0.14.0",
+    "slugify": "^1.6.6",
+    "stripe": "^14.17.0"
   }
 }

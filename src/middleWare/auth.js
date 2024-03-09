@@ -1,33 +1,34 @@
 import jwt from 'jsonwebtoken'
-import userModel from "./../DB/models/user.model.js";
-import { asyncHandler } from './../utils/asyncHandeller.js';
-const auth = (role) => {
-    return  async (req, res, next) => {
-        const { authorization } = req.headers
-        if (!authorization) {
-            return next(new Error('please login') , {cause : 400})
+import userModel from '../../DB/model/User.model.js'
+
+
+const auth = (role)=>{
+   return async(req,res,next)=>{
+        const {auth} = req.headers
+         if(!auth?.startsWith(process.env.BEARERtOKEN)){
+            return next(new Error ('invalid bearer token'),{cause:400})
+         }
+         const token = auth.split(process.env.BEARERtOKEN)[1]
+        if(!token){
+            return next(new Error ('invalid token'),{cause:400})
         }
-        const token = authorization.split(process.env.BEARER_KEY)[1]
-        if (!token) {
-            return next(new Error('invalid bearer key'))
+        const payload = jwt.verify(token,process.env.TOKEN_SEGNATURE)
+        if(!payload?._id){
+            return next(new Error ('invalid payload'),{cause:400})
         }
-        const payload = jwt.verify(token, process.env.TOKEN_SIGNETURE)
-        if (!payload?._id) {
-            return next(new Error('invalid payload') , {cause : 400}) 
+        const user = await userModel.findOne({_id:payload._id}).select('userName email status role')
+        if(!user){
+            return next(new Error ('not register account'),{cause:404})
         }
-        const user = await userModel.findById({ _id: payload._id }).select('email role ')
-        if (!user) {
-            return next(new Error('invalid id') , {cause : 404})
+        if(user.status == 'Offline'){
+            return next(new Error ('please login'),{cause:404})
         }
-        if(user.status == "offline ")  {
-            return next (new Error ("plese login " ) , {cause : 400})
-        }
-         console.log(role)
-        if(!role.includes(user.role)) {
-            return next(new Error ("dont have a acess ") , {cause : 401})
+        if(!role.includes(user.role)){
+            return next(new Error ('do not have access'),{cause:401})
         }
         req.user = user
         next()
-    }
+        }
 }
-export default auth
+export default auth 
+

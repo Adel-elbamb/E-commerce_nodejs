@@ -1,4 +1,0 @@
-muter => dont convert buffer to  data in body 
-//{ abortEarly: false } => in validation useing if have more then error retuen all on the time
-
-//joi.string.pattren() => using to validation a langauge of input in api (arabic or english )

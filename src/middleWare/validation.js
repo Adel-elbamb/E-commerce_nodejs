@@ -1,36 +1,62 @@
-import { Types } from 'mongoose'
 
-export const validationId = (value, helper) => {
-    return Types.ObjectId.isValid(value) ?
-        true :
-        helper.message('invalid format of id')
-}
-// if  containHeaders  equl true to cheak for  authouttion  
-const validation = (schema , containHeaders = false ) => {
-    return (req, res, next) => {
-        const { authorization } = req.headers //data ,undefiend
-        let data;
-            data = { ...req.body, ...req.params, ...req.query }
-        if (req.file) {  //this req.file is alone becouse validation this can check an object of data 
-            data = { ...data, image: req.file }
-        }
-        if (req.files) {
-            data = { ...data, files: req.files }
-        }
-
-        //to cheack the token when using multer 
-        if (authorization && containHeaders) {
-            data = {authorization}
-        }
-        // console.log(data);
-        const validationResult = schema.validate(data , { abortEarly: false }) // 
-        //{ abortEarly: false } => in validation useing if have more then error retuen all on the time
-        if (validationResult.error) {
-            req.validationError = validationResult.error // to send validationResult.error from golabel error to return error details for frontend 
-            
-            return next(new Error ("catch validation error"), {cause : 400})
-        }
-        next()
+const validation =(schema,containHeaders = false)=>{
+    return (req,res,next)=>{
+try {
+    let methods = {...req.body , ...req.params , ...req.query}
+    if(req.file){
+        methods.file = req.file
     }
+    if(req.files){
+        methods.files = req.files
+    }
+    if(req.headers.auth && containHeaders){
+        methods = {auth : req.headers.auth}
+    }
+    const validationresult = schema.validate(methods,{abortEarly : false})
+if(validationresult.error){
+req.validationresult = validationresult.error 
+return next(new Error('validation error',{cause : 400}))
 }
+next()
+
+} catch (error) {
+    return res.json({message: error.message , stack : error.stack})
+
+}
+}
+}
+
+
 export default validation
+
+
+
+// const validation = (schema)=>{
+// return (req,res,next)=>{
+//  try {
+//     let methods 
+//     if (req.headers.auth){
+//         methods = {...req.body , ...req.params , ...req.query,auth :req.headers.auth}
+//     }else {
+//         methods = {...req.body , ...req.params , ...req.query}
+//     }
+//     if(req.file){
+//         methods = {...methods, file: req.file}
+//     }
+//     if(req.files){
+//         methods = {...methods, files: req.files}
+//     }
+//     const validation = schema.validate(methods,{abortEarly:false}) 
+//     if(validation?.error){
+//        // return res.status(403).json({message:"done",result : validation.error.details})
+//        req.validationresult =  validation.error.details
+//         return next (new Error ('validation error',{cause : 403}))
+//     }
+//    return next()
+// }
+//  catch (error) {
+//     return res.json({message: error.message , stack : error.stack})
+//     }
+// }}
+// export default validation 
+// //403 -->  Forbidden error

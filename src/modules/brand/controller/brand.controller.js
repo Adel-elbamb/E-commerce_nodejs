@@ -1,97 +1,68 @@
-import slugify from 'slugify'
-import brandModel from './../../../DB/models/brand.model.js'
-import catogeryModel from './../../../DB/models/categry.model.js'
-import subcatogeryModel from './../../../DB/models/subcarogery.model.js'
- import   cloudinary from './../../../utils/coludinery.js'
+import slugify from "slugify"
+import brandModel from "../../../../DB/model/Brand.model.js"
+import cloudinary from "../../../utils/cloudinary.js"
+import {asyncHandler} from "../../../utils/asynchandler.js"
+import categoryModel from "../../../../DB/model/Category.model.js"
 
-//addCatogrey
-export const  Createbrand = async (req ,res ,next ) => {
-    const {name , catogeryId , subcatogeryId} = req.body 
-    //find catogery 
-    const catogery = await catogeryModel.findOne({ _id : catogeryId}) 
-    if(!catogery) {
-        return next(new Error ("not found catogery "))
+export const addBrand = asyncHandler(async(req,res,next)=>{
+    //1
+    const {name} = req.body
+
+    if (await brandModel.findOne({name})){
+        return next(new Error('name must be unique',{cause: 409})) //conflict
     }
-    const subcatogery = await  subcatogeryModel.findOne({_id : subcatogeryId})
-    if(!subcatogery) {
-        return next (new Error ("not found sub catogery"))
+    //2
+    const {public_id,secure_url} = await cloudinary.uploader.upload(req.file.path,{folder : `${process.env.APP_NAME}/brand`})
+    if(!public_id){
+        return next(new Error('image not uploaded',{cause: 400}))
     }
-    const brandExist = await brandModel.findOne({name})
-    if(brandExist) {
-        return next(new Error (" name brand  is exist  ") , {cause : 409})
+    req.body.image = {public_id,secure_url}
+    //3
+    req.body.slug = slugify(name)
+    req.body.createdBy = req.user._id
+    //4
+    const create = await brandModel.create(req.body)
+    return res.status(201).json({message:"done",brand : create}) 
+
+})
+//get all brands
+export const allBrands =asyncHandler(async(req,res,next)=>{ 
+    const allBrands = await brandModel.find({})
+    return res.status(200).json({message:"done",allBrands}) 
+})
+//get one brand
+export const oneBrand = asyncHandler(async(req,res,next)=>{
+    const oneBrand = await brandModel.findById({ _id: req.params.brandId })
+    if (!oneBrand) {
+                return next(new Error("brand not found", { cause: 404 }));
     }
-    //add image 
-    // console.log(req.file)
-    const {public_id , source_url} =  await cloudinary.uploader.upload(req.file.path ,{folder : `/brand`})
-     console.log({public_id , source_url})
-    
-    if (!public_id) {
-        return next(new Error (" name catogery is exist  ") , {cause : 404})
+return res.status(200).json({message:"done",oneBrand}) 
+})
+
+export const updateBrands = asyncHandler(async(req,res,next)=>{
+    const {brandId} = req.params
+    const id_exist = await brandModel.findById({_id : brandId})
+    if (! id_exist) {
+        return next(new Error('brand not found',{cause: 404}))
     }
-      req.body.slug = await slugify(name) // useing in search and put - between in space
-    //   console.log(req.user._id)
-   req.body.createdBy = req.user._id 
-    const newbrand = await brandModel.create({
-        name ,
-         image : {public_id , source_url} ,
-         slug : name ,
-         catogeryId ,
-         subcatogeryId
-    }) 
-     return res.status(201).json({message : "done"  , newbrand})
-
-}
-
-//allbrand 
-export const allBrand = async (req,res,next) => {
-    const brand = await brandModel.find()
-    return res.status(200).json({message : "done" , allBrand : brand })
-}
-// //one Brand using _id 
-
-export const oneBrand = async (req,res,next) => {
-    const {brandId} = req.params 
-    const brand = await brandModel.findById({_id : brandId})
-    return res.status(200).json({message : "one  brand is " , brand })
-}
-// // update Catogery 
-// //1-if catogery exist 
-// //2-if update name --> name is exist --> change slug 
-// //3-if update image --> chanage image --> remove image befor 
-// //4- update catory 
-export const updateBrand = async (req ,res,next) => {
-    // 1-
-    const {brandId} = req.params 
-    const brand = await brandModel.findById({_id : brandId})
-    if (!brand) {
-        return next(new Error ("Brand not exist ") , {cause : 404})
+    if(req.body.name){
+        const name_exist = await brandModel.findOne({name: req.body.name})
+        if(name_exist){
+            return next(new Error('name must be unique',{cause: 409}))
+        }
+        req.body.slug = slugify(req.body.name)
     }
-//2-
- if (req.body.name) {
-    const nameExist = await brandModel.findOne({ name : req.body.name})
-     if(nameExist) {
-        // return res.status(409).json({message : "catogry name exist before "})
-        return next (new Error ("brand name exist before " , {cause : 409}))
+    if(req.file){
+    const {public_id,secure_url} = await cloudinary.uploader.upload(req.file.path,{folder : `${process.env.APP_NAME}/brand`})
+    if(!public_id){
+        return next(new Error('image not uploaded',{cause: 400}))
+    }
+    req.body.image = {public_id,secure_url}
+    await cloudinary.uploader.destroy(id_exist.image.public_id)
+    }
+    req.body.updatedBy = req.user._id
+   const updated = await brandModel.findOneAndUpdate({_id : brandId},req.body,{new : true})
 
-     }
-     req.body.slug = slugify(req.body.name)
- }
-//3-
- if(req.body.logo) {
-    const {public_id , source_url} =  await cloudinary.uploader.upload(req.file.path ,{folder : `/brand`})
-    // console.log({public_id , source_url})
-   if (!public_id) {
-    return next(new Error ("image not upload "))
+   return res.status(200).json({message:"updated sucessfully",updated}) 
 
-   }
-   console.log(brand.logo.public_id)
-    const deleteimage = await coludinery.uploader.destroy({public_id : brand.logo.public_id})
- }
-
-//  4- 
-const updateBrand = await brandModel.findOneAndUpdate({_id : brandId} , req.body ,{new : true })
-return res.status(200).json({message : "done" , updateBrand })
-}
-
-
-
+})

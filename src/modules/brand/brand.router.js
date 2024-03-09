@@ -1,22 +1,33 @@
-import {Router} from 'express'
-import {asyncHandler} from '../../utils/asyncHandeller.js'
-import validation from '../../middleware/validation.js'
-import {uploadFile , validationTypes } from './../../utils/cloudinryMulter.js'
-import * as BC from './controller/brand.controller.js'
-import * as Bv from './brand.validation.js'
-import auth from './../../middleWare/auth.js'
+import Router from "express"
+import uploadFilecloud, { fileValidation } from "../../utils/multer.js"
+import * as brandControl from "./controller/brand.controller.js"
+import brandEndpoint from "./brand.endpoint.js"
+import validation from "../../middleware/validation.js"
+import * as brandValidation from './brand.validation.js'
+import auth from "../../middleware/auth.js"
+
 
 const router = Router()
-  // mergeParams to get url from catogery/catogeryId/subcatogery
 
-router.post ('/' ,
-auth
- ,uploadFile({customTypes : validationTypes.image }).single('image')
- ,validation(Bv.addBrandSchema)
- ,asyncHandler(BC.Createbrand))
- .get('/' , BC.allBrand)
- .get('/:brandId' ,validation(Bv.oneBrandSchema), BC.oneBrand)
- .patch('/:brandId',uploadFile({customTypes : validationTypes.image}).single('logo')
- ,validation(Bv.UpdateBrandSchema)
- ,asyncHandler(BC.updateBrand))
-export default router 
+router.post('/',
+    validation(brandValidation.authSchema, true),
+    auth(brandEndpoint.create),
+    uploadFilecloud(fileValidation.image).single('image'),
+    validation(brandValidation.addBrandSchema),
+    brandControl.addBrand)
+
+    .get('/',
+        brandControl.allBrands)
+    
+    .get('/:brandId',
+        validation(brandValidation.oneBrandSchema),
+        brandControl.oneBrand)
+    
+    .put('/:brandId',
+        validation(brandValidation.authSchema, true),
+        auth(brandEndpoint.update),
+        uploadFilecloud(fileValidation.image).single('image'),
+        validation(brandValidation.updateBrandSchema),
+        brandControl.updateBrands)
+
+export default router

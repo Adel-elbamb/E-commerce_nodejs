@@ -1,11 +1,12 @@
 import bcrypt from 'bcryptjs'
 
-export const hashPass = (plainText , sult = +process.env.SULT_ROUND) => {
-    const hashPassword = bcrypt.hashSync(plainText, parseInt(sult))
-    return hashPassword
+
+export const hash = ({plaintext, salt = process.env.SALT_ROUND}={})=>{
+ const hashResult = bcrypt.hashSync(plaintext,parseInt(salt)) 
+ return hashResult
 }
 
-export const compare = ({plainText , hashValeau} = {}) => {
-    const match= bcrypt.compareSync(plainText ,hashValeau)
-    return match 
-}
+export const compare = ({plaintext, hashValue}={})=>{
+    const match = bcrypt.compareSync(plaintext,hashValue) 
+    return match
+   }

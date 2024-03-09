@@ -1,8 +1,8 @@
-import roles from './../../utils/systemRoles.js'
+import roles from "../../utils/roles.js"
 
-const productEndPoints = {
-    create : roles.Admin,
-    update : roles.Admin
+const productEndpoint ={
+    create : [roles.Admin],
+    update : [roles.Admin]
+
 }
-
-export default productEndPoints
+export default productEndpoint
