@@ -5,7 +5,7 @@ import * as authValidation from './auth.validation.js'
 import auth from "../../middleware/auth.js"
 import authEndpoint from "./auth.endpoint.js"
 const router = Router()
-
+ ///========================================Router ==================================
 router
   .post(
     "/signUp",
@@ -56,5 +56,5 @@ auth(authEndpoint.deleteAccount),
 validation(authValidation.deleteSchema),
 authController.deleteAccount)
   
-// .post("/loginWithgmail", authController.loginWithgmail);
+
 export default router

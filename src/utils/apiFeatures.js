@@ -23,7 +23,6 @@ class ApiFeatures {
     });
 
     const filter = JSON.parse(
-      //regex should be accurate
       JSON.stringify(excludeQuery).replace(
         /(gt|lt|gte|lte|eq|in|nin|ne)/g,
         (match) => `$${match}`

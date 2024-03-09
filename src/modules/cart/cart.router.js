@@ -2,9 +2,11 @@ import Router from "express";
 import * as cartController from './controller/cart.controller.js'
 import * as cartValidation from './cart.validation.js'
 import  cartEndpoint from './cart.endpoint.js'
-import auth from "../../middleware/auth.js";
-
 import validation from "../../middleware/validation.js"
+import auth from "../../middleware/auth.js";
+//==============================Router===================================
+
+
 
 
 const router = Router();

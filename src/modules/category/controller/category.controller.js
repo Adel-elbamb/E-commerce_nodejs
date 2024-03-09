@@ -3,12 +3,13 @@ import categoryModel from "../../../../DB/model/Category.model.js"
 import cloudinary from "../../../utils/cloudinary.js"
 import {asyncHandler} from "../../../utils/asynchandler.js"
 
+
+
+//========================================addCatogery ============================================
 //1-check name exist or not 
 //2- upload image 
 //3- make slug of name  
 //3- add category
-
-//========================================addCatogery ============================================
 export const addCategory = asyncHandler(async(req,res,next)=>{
     //1
     const {name} = req.body
@@ -31,7 +32,6 @@ export const addCategory = asyncHandler(async(req,res,next)=>{
 
 })
 //=================================get all catogery ==================================
-//get all categories
 export const allCategories =asyncHandler(async(req,res,next)=>{ 
     const allCategories = await categoryModel.find({}).populate({
         path : 'subCategory'
@@ -39,7 +39,7 @@ export const allCategories =asyncHandler(async(req,res,next)=>{
     return res.status(200).json({message:"done",allCategories}) 
 })
 //==================================get one catogery=====================
-//get one category
+
 export const onecategory = asyncHandler(async(req,res,next)=>{
 const onecategory = await categoryModel.findById({_id : req.params.categoryId}).populate({
     path : 'subCategory'

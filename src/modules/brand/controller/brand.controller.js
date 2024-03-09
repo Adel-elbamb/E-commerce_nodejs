@@ -3,6 +3,7 @@ import brandModel from "../../../../DB/model/Brand.model.js"
 import cloudinary from "../../../utils/cloudinary.js"
 import {asyncHandler} from "../../../utils/asynchandler.js"
 import categoryModel from "../../../../DB/model/Category.model.js"
+///==========================================================================================
 
 export const addBrand = asyncHandler(async(req,res,next)=>{
     //1
@@ -38,7 +39,7 @@ export const oneBrand = asyncHandler(async(req,res,next)=>{
     }
 return res.status(200).json({message:"done",oneBrand}) 
 })
-
+//update brand 
 export const updateBrands = asyncHandler(async(req,res,next)=>{
     const {brandId} = req.params
     const id_exist = await brandModel.findById({_id : brandId})

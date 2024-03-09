@@ -1,9 +1,6 @@
 import userModel from "../../../../DB/model/User.model.js";
 import { asyncHandler } from "../../../utils/asynchandler.js";
-import {
-  generateToken,
-  verifyToken,
-} from "../../../utils/generateandverifytoken.js";
+import { generateToken,verifyToken,} from "../../../utils/generateandverifytoken.js";
 import sendEmail from "../../../utils/email.js";
 import { compare, hash } from "../../../utils/hashandcompare.js";
 import { customAlphabet } from "nanoid";
@@ -12,7 +9,7 @@ import { OAuth2Client } from "google-auth-library";
 
 // Sign Up
 export const signUp = asyncHandler(async (req, res, next) => {
-  //get data from req
+  
   const { email, firstName, lastName, mobileNumber } = req.body;
   //check email exist
   if (await userModel.findOne({ email })) {
@@ -312,17 +309,3 @@ export const deleteAccount = asyncHandler(async (req, res, next) => {
 });
 
 
-// export const loginWithgmail = asyncHandler((req, res, next) => {
-//   const { idToken } = req.body;
-//   const client = new OAuth2Client();
-//   async function verify() {
-//     const ticket = await client.verifyIdToken({
-//       idToken,
-//       audience: process.env.CLIENT_ID,
-//     });
-//     const payload = ticket.getPayload();
-//    return payload
-//   }
-//     const payload = verify()
-//     console.log(payload);
-// });

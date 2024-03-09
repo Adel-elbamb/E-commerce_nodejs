@@ -4,10 +4,8 @@ import * as orderValidation from "./order.validation.js";
 import orderEndpoint from "./order.endpoints.js";
 import auth from "../../middleware/auth.js";
 import validation from "../../middleware/validation.js";
-//("sk_test_...");
-
 const router = Router();
-//onway and rejected عليا 
+
 
 router.post(
   "/",

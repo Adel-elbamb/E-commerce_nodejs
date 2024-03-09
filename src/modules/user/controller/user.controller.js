@@ -42,7 +42,7 @@ export const removeFromWishlist = asyncHandler(async (req, res, next) => {
   return res.json({ message: "done", user });
 });
 
-// Get user account data
+// get one user is acouent when you is oner 
 export const userAccountData = asyncHandler(async (req, res, next) => {
   //get data from req
   const { userId } = req.params;

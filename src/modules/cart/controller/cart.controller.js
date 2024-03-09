@@ -52,13 +52,7 @@ export const deleteFromCart= asyncHandler(async (req, res, next) => {
     if (!cartExist) {
         return next(new Error("cart not found"), { cause: 404 });
     }
-    //  for (const product of cartExist.products) {
-    //    if (product.productId == productId) {
-    //        delete product.productId
-    //        delete product.quantity
-    //        delete product._id
-    //    }
-    // }
+    // 
    const updateCart = await cartModel.findOneAndUpdate({ userId: req.user._id },
         {
             $pull: {
