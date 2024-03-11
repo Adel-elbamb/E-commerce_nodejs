@@ -63,10 +63,10 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
     return res.redirect("https://www.facebook.com/");
   }
   if (user.confirmEmail) {
-    return res.redirect("https://www.linkedin.com/in/yasmin-yasser-259b521b3/");
+    return res.redirect("https://www.facebook.com/adel.elbamby.5/");
   }
   await userModel.updateOne({ email }, { confirmEmail: true }, { new: true });
-  return res.redirect("https://www.linkedin.com/in/yasmin-yasser-259b521b3/");
+  return res.redirect("https://www.facebook.com/adel.elbamby.5/");
 });
 
 export const refreshToken = asyncHandler(async (req, res, next) => {
@@ -80,7 +80,7 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
     return res.redirect("https://www.facebook.com/");
   }
   if (user.confirmEmail) {
-    return res.redirect("https://www.linkedin.com/in/yasmin-yasser-259b521b3/");
+    return res.redirect("https://www.facebook.com/adel.elbamby.5/");
   }
   const newtoken = generateToken({
     payload: { email },
