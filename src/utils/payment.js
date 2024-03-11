@@ -22,6 +22,11 @@ async function payment({
     })
     return session;
 }
+
+
+export default payment
+
+
  // in setion 
 // line_items = [{
 //             price_data: {
@@ -33,5 +38,3 @@ async function payment({
 //       },
 //       quantity: 1,
 //     }],
-
-export default payment
